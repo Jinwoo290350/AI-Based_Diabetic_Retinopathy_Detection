@@ -62,3 +62,9 @@ This project aims to develop a deep learning-based model for detecting diabetic 
    ```bash
    git clone https://github.com/Jinwoo290350/AI-Based_Diabetic_Retinopathy_Detection.git
    cd AI-Based_Diabetic_Retinopathy_Detection
+---
+
+### acc and loss
+
+![image](https://github.com/user-attachments/assets/8028124a-2594-4b13-b769-7b150c9eebaa)
+![image](https://github.com/user-attachments/assets/b2b943e3-ed75-4a5b-8e2e-b93240c6b943)
