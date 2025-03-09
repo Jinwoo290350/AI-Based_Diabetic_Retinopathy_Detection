@@ -26,9 +26,9 @@
 
 ![image](https://github.com/user-attachments/assets/18afc44e-c4e8-4815-bbfa-e301a1214b25)
 
- From quick investigations of the data (see various pictures below), I found that Hemorrphages, Hard Exudates and Cotton Wool spots are quite easily 
- observed. However, I still could not find examples of Aneurysm or Abnormal Growth of Blood Vessels from our data yet. Perhaps the latter two cases are 
- important if we want to catch up human benchmnark using our model.
+  From quick investigations of the data (see various pictures below), I found that Hemorrphages, Hard Exudates and Cotton Wool spots are quite easily 
+  observed. However, I still could not find examples of Aneurysm or Abnormal Growth of Blood Vessels from our data yet. Perhaps the latter two cases 
+  are important if we want to catch up human benchmnark using our model.
 ---
 
 ## โมเดล (Model)
