@@ -1,64 +1,64 @@
-# AI-Based_Diabetic_Retinopathy_Detection
+# AI-Based Diabetic Retinopathy Detection
 
-โครงการนี้มีวัตถุประสงค์เพื่อพัฒนาโมเดลสำหรับตรวจจับโรคเบาหวานในรูม่านตาโดยใช้เทคนิค Deep Learning ที่สามารถช่วยในการวินิจฉัยและคัดกรองโรคเบาหวานในระยะเริ่มแรก
-
----
-
-## รายละเอียดโครงการ
-
-- **ชื่อโครงการ:** AI-Based_Diabetic_Retinopathy_Detection
-- **จุดประสงค์:** พัฒนาโมเดลตรวจจับโรคเบาหวานในรูม่านตาเพื่อสนับสนุนนวัตกรรมทางการแพทย์
-- **เครื่องมือและเทคโนโลยี:** Python, Jupyter Notebook, Keras/TensorFlow
+This project aims to develop a deep learning-based model for detecting diabetic retinopathy. The model is designed to assist in the early diagnosis and screening of diabetic retinopathy in patients.
 
 ---
 
-## แหล่งข้อมูล (Datasets)
+## Project Details
+
+- **Project Name:** AI-Based Diabetic Retinopathy Detection
+- **Objective:** Develop a model to detect diabetic retinopathy to support medical innovation.
+- **Tools and Technologies:** Python, Jupyter Notebook, Keras/TensorFlow
+
+---
+
+## Datasets
 
 - **Diabetic Retinopathy Resized Dataset:**  
-  โดนได้มาจาก [Kaggle Dataset](https://www.kaggle.com/datasets/tanlikesmath/diabetic-retinopathy-resized)  
-  (Dataset นี้มีการปรับขนาดภาพเพื่อให้เหมาะสมกับการประมวลผลและเทรนโมเดล)
+  Sourced from the [Kaggle Dataset](https://www.kaggle.com/datasets/tanlikesmath/diabetic-retinopathy-resized)  
+  *(This dataset contains resized images to facilitate processing and model training)*
 
 ---
-## explian DATA
-- **Simple picture to explain Diabetic Retinopathy**
- How do we know that a patient have diabetic retinopahy? There are at least 5 things to spot on. Image credit https://www.eyeops.com/credit : 
- https://www.eyeops.com/
 
-![image](https://github.com/user-attachments/assets/18afc44e-c4e8-4815-bbfa-e301a1214b25)
+## Explain Data
 
-  From quick investigations of the data (see various pictures below), I found that Hemorrphages, Hard Exudates and Cotton Wool spots are quite easily 
-  observed. However, I still could not find examples of Aneurysm or Abnormal Growth of Blood Vessels from our data yet. Perhaps the latter two cases 
-  are important if we want to catch up human benchmnark using our model.
+- **Simple Illustration for Diabetic Retinopathy:**  
+  How do we know if a patient has diabetic retinopathy? There are at least five key indicators to spot.  
+  Image credit: [EyeOps](https://www.eyeops.com/)  
+  ![image](https://github.com/user-attachments/assets/18afc44e-c4e8-4815-bbfa-e301a1214b25)
+
+  From a preliminary investigation of the data (see various images below), I found that hemorrhages, hard exudates, and cotton wool spots are quite easily observed. However, I have not yet found examples of aneurysms or abnormal growth of blood vessels in our dataset. Perhaps these latter two cases are important if we wish to achieve human benchmark performance with our model.
+
 ---
 
-## โมเดล (Model)
+## Model
 
 - **Densenet Keras:**  
-  ใช้สถาปัตยกรรม DenseNet ที่นำมาปรับใช้ผ่าน [Densenet Keras](https://www.kaggle.com/datasets/xhlulu/densenet-keras)  
-  (โมเดลนี้ช่วยให้การวิเคราะห์ภาพมีความแม่นยำและประสิทธิภาพสูงในการตรวจจับสัญญาณของโรค)
+  We utilize the DenseNet architecture adapted from [Densenet Keras](https://www.kaggle.com/datasets/xhlulu/densenet-keras).  
+  *(This model offers high accuracy and efficiency in detecting signs of diabetic retinopathy)*
 
 ---
 
-## เครดิตข้อมูลการแข่งขัน (Data Competition Credit)
+## Data Competition Credit
 
-- โครงการนี้ได้รับแรงบันดาลใจและข้อมูลจากการแข่งขัน [APTOS 2019 Blindness Detection](https://www.kaggle.com/competitions/aptos2019-blindness-detection)  
-  (ขอบคุณการแข่งขันและชุมชน Kaggle ที่ให้ข้อมูลและแนวคิดสำหรับการพัฒนาโมเดลนี้)
-
----
-
-## โค้ดและการทำงาน
-
-- **ไฟล์หลัก:** `cedt-hackathon-of-newbie.ipynb`  
-  ไฟล์ Notebook นี้ประกอบด้วยขั้นตอนต่าง ๆ ดังนี้:
-  - **Data Preprocessing:** การเตรียมข้อมูลและปรับขนาดภาพ
-  - **Model Training:** การเทรนโมเดลโดยใช้สถาปัตยกรรม DenseNet
-  - **Evaluation:** การประเมินผลโมเดลและปรับแต่งพารามิเตอร์
+- This project is inspired by and utilizes data from the [APTOS 2019 Blindness Detection competition](https://www.kaggle.com/competitions/aptos2019-blindness-detection).  
+  *(We thank the competition organizers and the Kaggle community for providing the data and insights that helped shape this model)*
 
 ---
 
-## วิธีการใช้งาน
+## Code and Workflow
 
-1. **Clone Repository:**
+- **Main File:** `cedt-hackathon-of-newbie.ipynb`  
+  This Jupyter Notebook includes the following steps:
+  - **Data Preprocessing:** Preparing and resizing images.
+  - **Model Training:** Training the model using the DenseNet architecture.
+  - **Evaluation:** Assessing model performance and fine-tuning parameters.
+
+---
+
+## How to Use
+
+1. **Clone the Repository:**
    ```bash
    git clone https://github.com/Jinwoo290350/AI-Based_Diabetic_Retinopathy_Detection.git
    cd AI-Based_Diabetic_Retinopathy_Detection
