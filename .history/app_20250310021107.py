@@ -35,10 +35,6 @@ st.markdown("""
         padding: 25px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin-top: 20px;
-        color: #333333; /* เพิ่มสีตัวหนังสือดำ */
-    }
-    .diagnosis-box * {
-        color: #333333 !important; /* กำหนดสีให้ทุก element ในกล่อง */
     }
     .image-preview {
         border: 2px solid #AED6F1;
@@ -68,14 +64,14 @@ st.markdown("""
 # โหลดโมเดล AI
 try:
     model = load_model('CEDT_Model.h5', compile=False, safe_mode=False)
-    TARGET_SIZE = model.input_shape[1:3]
+    TARGET_SIZE = model.input_shape[1:3]  # รับขนาดภาพจากโมเดล
 except Exception as e:
     st.error(f"⚠️ ไม่สามารถโหลดโมเดลได้: {str(e)}")
     st.stop()
 
 # ตั้งค่า Typhoon API
-TYPHOON_API_KEY = "sk-3wY19YJQdjyYVBnwdjZKlpa3X7KG58tACnkPuAaH5rT8k70u"
-TYPHOON_API_URL = "https://api.opentyphoon.ai/v1/chat/completions"
+TYPHOON_API_KEY = "Tsk-3wY19YJQdjyYVBnwdjZKlpa3X7KG58tACnkPuAaH5rT8k70u"
+TYPHOON_API_URL = "https://opentyphoon.ai/api/v1/chat/completions"
 
 headers = {
     "Content-Type": "application/json",

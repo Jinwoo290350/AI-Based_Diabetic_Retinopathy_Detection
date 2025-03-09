@@ -35,10 +35,6 @@ st.markdown("""
         padding: 25px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin-top: 20px;
-        color: #333333; /* เพิ่มสีตัวหนังสือดำ */
-    }
-    .diagnosis-box * {
-        color: #333333 !important; /* กำหนดสีให้ทุก element ในกล่อง */
     }
     .image-preview {
         border: 2px solid #AED6F1;
@@ -68,7 +64,7 @@ st.markdown("""
 # โหลดโมเดล AI
 try:
     model = load_model('CEDT_Model.h5', compile=False, safe_mode=False)
-    TARGET_SIZE = model.input_shape[1:3]
+    TARGET_SIZE = model.input_shape[1:3]  # รับขนาดภาพจากโมเดล
 except Exception as e:
     st.error(f"⚠️ ไม่สามารถโหลดโมเดลได้: {str(e)}")
     st.stop()

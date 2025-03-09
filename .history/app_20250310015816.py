@@ -2,7 +2,7 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 from tensorflow.keras.models import load_model
-import requests
+from openai import OpenAI
 import os
 import time
 
@@ -35,10 +35,6 @@ st.markdown("""
         padding: 25px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin-top: 20px;
-        color: #333333; /* เพิ่มสีตัวหนังสือดำ */
-    }
-    .diagnosis-box * {
-        color: #333333 !important; /* กำหนดสีให้ทุก element ในกล่อง */
     }
     .image-preview {
         border: 2px solid #AED6F1;
@@ -55,32 +51,22 @@ st.markdown("""
         background: #2980B9 !important;
         transform: scale(1.05);
     }
-    .error-box {
-        background: #FFEBEE;
-        color: #B71C1C;
-        padding: 15px;
-        border-radius: 10px;
-        margin: 10px 0;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # โหลดโมเดล AI
 try:
     model = load_model('CEDT_Model.h5', compile=False, safe_mode=False)
-    TARGET_SIZE = model.input_shape[1:3]
+    TARGET_SIZE = model.input_shape[1:3]  # รับขนาดภาพจากโมเดล
 except Exception as e:
     st.error(f"⚠️ ไม่สามารถโหลดโมเดลได้: {str(e)}")
     st.stop()
 
-# ตั้งค่า Typhoon API
-TYPHOON_API_KEY = "sk-3wY19YJQdjyYVBnwdjZKlpa3X7KG58tACnkPuAaH5rT8k70u"
-TYPHOON_API_URL = "https://api.opentyphoon.ai/v1/chat/completions"
-
-headers = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {TYPHOON_API_KEY}"
-}
+# ตั้งค่า Typhoon LLM
+client = OpenAI(
+    api_key="sk-3wY19YJQdjyYVBnwdjZKlpa3X7KG58tACnkPuAaH5rT8k70u",
+    base_url="https://opentyphoon.ai/api/v1"
+)
 
 def preprocess_image(image):
     """ปรับขนาดและเตรียมภาพสำหรับโมเดล"""
@@ -90,53 +76,37 @@ def preprocess_image(image):
         img = image.resize(TARGET_SIZE, Image.Resampling.LANCZOS)
         return np.expand_dims(np.array(img)/255.0, axis=0)
     except Exception as e:
-        st.markdown(f'<div class="error-box">⚠️ เกิดข้อผิดพลาดในการประมวลผลภาพ: {str(e)}</div>', unsafe_allow_html=True)
+        st.error(f"⚠️ เกิดข้อผิดพลาดในการประมวลผลภาพ: {str(e)}")
         return None
 
-def generate_medical_advice(level):
-    """สร้างคำแนะนำทางการแพทย์ด้วย Typhoon API"""
-    prompt = f"""
+def generate_advice(level):
+    """สร้างคำแนะนำทางการแพทย์ด้วย Typhoon LLM"""
+    prompt_template = f"""
     คุณคือจักษุแพทย์ผู้เชี่ยวชาญ โปรดให้คำแนะนำสำหรับผู้ป่วยโรคจอประสาทตาเบาหวานระดับ {level}
-    โดยแบ่งเป็นหัวข้อต่อไปนี้:
-    1. อาการที่พบ (อธิบายด้วยภาษาง่ายๆ)
-    2. แนวทางการรักษา (ระบุวิธีการรักษาหลัก)
-    3. ข้อควรปฏิบัติตัว (รายละเอียดการดูแลตนเอง)
-    4. อาหารแนะนำ (ตัวอย่างเมนูอาหาร)
-    5. ข้อห้าม (สิ่งต้องหลีกเลี่ยง)
-    6. คำแนะนำเพิ่มเติม (เคล็ดลับการดูแลสุขภาพตา)
-    
-    โปรดใช้ภาษาที่เข้าใจง่าย ไม่ใช้ศัพท์เทคนิคเกินจำเป็น
+    โดยแบ่งออกเป็นส่วนดังนี้:
+    1. อาการที่พบ
+    2. แนวทางการรักษา
+    3. ข้อควรปฏิบัติ
+    4. อาหารแนะนำ
+    5. ข้อห้าม
+    6. คำแนะนำเพิ่มเติม
+    โปรดใช้ภาษาที่เข้าใจง่าย พร้อมตัวอย่างการปฏิบัติตัว
     """
     
     try:
-        payload = {
-            "model": "typhoon-v1.5x-70b-instruct",
-            "messages": [
-                {"role": "system", "content": "คุณเป็นผู้เชี่ยวชาญด้านจักษุวิทยา"},
-                {"role": "user", "content": prompt}
+        response = client.chat.completions.create(
+            model="typhoon-v1.5x-70b-instruct",
+            messages=[
+                {"role": "system", "content": prompt_template},
+                {"role": "user", "content": "สร้างคำแนะนำตามระดับความรุนแรง"}
             ],
-            "temperature": 0.3,
-            "max_tokens": 800,
-            "top_p": 0.95
-        }
-        
-        response = requests.post(
-            TYPHOON_API_URL,
-            headers=headers,
-            json=payload,
-            timeout=30
+            temperature=0.3,
+            max_tokens=600,
+            top_p=0.95
         )
-        
-        if response.status_code == 200:
-            return response.json()['choices'][0]['message']['content']
-        else:
-            error_msg = f"⚠️ ข้อผิดพลาด API (รหัส {response.status_code}): {response.text}"
-            st.markdown(f'<div class="error-box">{error_msg}</div>', unsafe_allow_html=True)
-            return None
-            
+        return response.choices[0].message.content
     except Exception as e:
-        error_msg = f"⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ: {str(e)}"
-        st.markdown(f'<div class="error-box">{error_msg}</div>', unsafe_allow_html=True)
+        st.error(f"⚠️ เกิดข้อผิดพลาดในการสร้างคำแนะนำ: {str(e)}")
         return None
 
 # ส่วนแสดงผล UI
@@ -190,7 +160,7 @@ if image_source:
                         prediction = model.predict(processed_img)
                         diagnosis_level = np.argmax(prediction[0])
                         
-                        advice = generate_medical_advice(diagnosis_level)
+                        advice = generate_advice(diagnosis_level)
                         
                         if advice:
                             st.session_state.diagnosis = {
@@ -201,8 +171,7 @@ if image_source:
                             st.rerun()
                             
                 except Exception as e:
-                    error_msg = f"⚠️ เกิดข้อผิดพลาดในการวิเคราะห์: {str(e)}"
-                    st.markdown(f'<div class="error-box">{error_msg}</div>', unsafe_allow_html=True)
+                    st.error(f"⚠️ เกิดข้อผิดพลาด: {str(e)}")
 
     with col2:
         if 'diagnosis' in st.session_state:
@@ -236,8 +205,7 @@ st.sidebar.markdown("""
 <div style="color:#666; margin-top:50px">
     <small>
     ℹ️ ระบบนี้ใช้เพื่อการสนับสนุนการวินิจฉัยเบื้องต้นเท่านั้น<br>
-    พัฒนาโดยทีม EYE Care - © 2025<br>
-    ใช้ Typhoon LLM สำหรับการสร้างคำแนะนำ
+    พัฒนาโดยทีม EYE Care - © 2025
     </small>
 </div>
 """, unsafe_allow_html=True)

@@ -2,22 +2,24 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 from tensorflow.keras.models import load_model
+from tensorflow.saved_model import LoadOptions
 from openai import OpenAI
 import os
 
 # ตั้งค่าเริ่มต้น
-st.set_page_config(page_title="eye", layout="wide")
+st.set_page_config(page_title="EYE", layout="wide")
 
 # โหลดโมเดล classification
 try:
-    model = load_model('model.h5')  # เปลี่ยนชื่อไฟล์ตามจริง
+    load_options = LoadOptions(experimental_module_making="saved_model")
+    model = load_model('CEDT_Model.h5', options=load_options, compile=False)
 except Exception as e:
     st.error(f"โหลดโมเดลไม่สำเร็จ: {str(e)}")
     st.stop()
 
 # ตั้งค่า OpenAI Client
 client = OpenAI(
-    api_key=os.getenv("Tsk-3wY19YJQdjyYVBnwdjZKlpa3X7KG58tACnkPuAaH5rT8k70u"),  # ควรเก็บ API Key ใน environment variable
+    api_key=os.getenv("OPENAI_API_KEY"),
     base_url="https://api.opentyphoon.ai/v1",
 )
 
@@ -66,7 +68,8 @@ with st.sidebar:
     
     # เลือกโมเดล
     model_type = st.selectbox(
-        "Classify Model"
+        "Classify Model",
+        options=["Default Model", "Alternative Model"]
     )
     
     # ปรับพารามิเตอร์

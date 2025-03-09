@@ -6,24 +6,27 @@ from openai import OpenAI
 import os
 
 # ตั้งค่าเริ่มต้น
-st.set_page_config(page_title="SurgiCare", layout="wide")
+st.set_page_config(page_title="EYE", layout="wide")
 
 # โหลดโมเดล classification
 try:
-    model = load_model('model.h5')  # เปลี่ยนชื่อไฟล์ตามจริง
+    model = load_model('CEDT_Model.h5', compile=False, safe_mode=False)
+    # ตรวจสอบขนาด Input ของโมเดล
+    model_input_shape = model.input_shape[1:3]
 except Exception as e:
     st.error(f"โหลดโมเดลไม่สำเร็จ: {str(e)}")
     st.stop()
 
 # ตั้งค่า OpenAI Client
 client = OpenAI(
-    api_key=os.getenv("TYPHOON_API_KEY"),  # ควรเก็บ API Key ใน environment variable
+    api_key=os.getenv("OPENAI_API_KEY"),
     base_url="https://api.opentyphoon.ai/v1",
 )
 
 # ฟังก์ชันประมวลผลภาพ
 def preprocess_image(image):
-    img = image.resize((224, 224))
+    target_size = model_input_shape or (320, 320)  # ใช้ขนาดจากโมเดลหรือค่า default
+    img = image.resize(target_size)
     img_array = np.array(img) / 255.0
     return np.expand_dims(img_array, axis=0)
 
@@ -57,7 +60,7 @@ def generate_advice(user_eye, temperature, top_p):
     return ''.join(response)
 
 # ส่วนติดต่อผู้ใช้
-st.title("Welcome to SurgiCare!!")
+st.title("Welcome to our webapp!!")
 st.caption("AI Application for supporting post-surgery patient recovery")
 
 # ตั้งค่าใน Sidebar
@@ -66,7 +69,8 @@ with st.sidebar:
     
     # เลือกโมเดล
     model_type = st.selectbox(
-        "Classify Model"
+        "Classify Model",
+        options=["Default Model", "Alternative Model"]
     )
     
     # ปรับพารามิเตอร์
@@ -74,43 +78,68 @@ with st.sidebar:
     top_p = st.slider("Top P", 0.0, 1.0, 0.95)
     max_tokens = st.slider("Max Token", 50, 512, 512)
 
-# ส่วนอัปโหลดภาพ
+# ส่วนอัปโหลดภาพและตัวอย่าง
 st.header("Take a picture")
-uploaded_file = st.file_uploader(
-    "Upload or select a sample photo",
-    type=["jpg", "jpeg", "png"],
-    help="Limit 200MB per file - JPG, PNG, JPEG"
-)
+
+# เลือกตัวอย่างภาพ
+sample_images = []
+sample_folder = "sample_images"
+if os.path.exists(sample_folder):
+    sample_images = [f for f in os.listdir(sample_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+
+col1, col2 = st.columns(2)
+with col1:
+    uploaded_file = st.file_uploader(
+        "Upload your photo",
+        type=["jpg", "jpeg", "png"],
+        help="Limit 200MB per file - JPG, PNG, JPEG"
+    )
+
+with col2:
+    if sample_images:
+        selected_sample = st.selectbox("Or select a sample image", sample_images)
+    else:
+        st.warning("No sample images found in 'sample_images' folder")
 
 # เก็บประวัติการวินิจฉัย
 if 'diagnosis_history' not in st.session_state:
     st.session_state.diagnosis_history = []
 
-# เมื่อมีภาพอัปโหลด
+# เมื่อมีภาพอัปโหลดหรือเลือกตัวอย่าง
+image_source = None
 if uploaded_file:
+    image_source = Image.open(uploaded_file)
+elif sample_images and selected_sample:
+    image_path = os.path.join(sample_folder, selected_sample)
+    image_source = Image.open(image_path)
+
+# หน้าจอแสดงผลหลัก
+if image_source:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("Uploaded Image")
-        image = Image.open(uploaded_file)
-        st.image(image, use_column_width=True)
+        st.subheader("Input Image")
+        st.image(image_source, use_column_width=True)
         
         if st.button("Process Image"):
             with st.spinner("กำลังวิเคราะห์ภาพ..."):
                 # Classification
-                processed_img = preprocess_image(image)
-                prediction = model.predict(processed_img)
-                user_eye = np.argmax(prediction[0])
-                
-                # สร้างคำแนะนำ
-                advice = generate_advice(user_eye, temperature, top_p)
-                
-                # บันทึกประวัติ
-                st.session_state.diagnosis_history.append({
-                    "image": image,
-                    "level": user_eye,
-                    "advice": advice
-                })
+                processed_img = preprocess_image(image_source)
+                try:
+                    prediction = model.predict(processed_img)
+                    user_eye = np.argmax(prediction[0])
+                    
+                    # สร้างคำแนะนำ
+                    advice = generate_advice(user_eye, temperature, top_p)
+                    
+                    # บันทึกประวัติ
+                    st.session_state.diagnosis_history.append({
+                        "image": image_source,
+                        "level": user_eye,
+                        "advice": advice
+                    })
+                except Exception as e:
+                    st.error(f"เกิดข้อผิดพลาดในการประมวลผล: {str(e)}")
 
     with col2:
         if st.session_state.diagnosis_history:
@@ -127,3 +156,17 @@ for idx, record in enumerate(st.session_state.diagnosis_history):
             st.image(record["image"], width=150)
         with col2:
             st.write(record["advice"])
+
+# กล้องเว็บแคม
+st.header("Webcam Capture")
+camera_image = st.camera_input("Take a photo with your webcam")
+
+if camera_image:
+    image_source = Image.open(camera_image)
+    st.image(image_source, caption="Captured Image", use_column_width=True)
+
+# แสดงคำเตือนเกี่ยวกับขนาดภาพ
+if model_input_shape:
+    st.warning(f"โมเดลนี้ต้องการภาพขนาด {model_input_shape[0]}x{model_input_shape[1]} พิกเซล")
+else:
+    st.warning("ไม่พบข้อมูลขนาดภาพที่โมเดลต้องการ")

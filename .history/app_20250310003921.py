@@ -10,14 +10,14 @@ st.set_page_config(page_title="EYE", layout="wide")
 
 # โหลดโมเดล classification
 try:
-    model = load_model('CEDT_')  # เปลี่ยนชื่อไฟล์ตามจริง
+    model = load_model('CEDT_Model.h5', compile=False, safe_mode=False)
 except Exception as e:
     st.error(f"โหลดโมเดลไม่สำเร็จ: {str(e)}")
     st.stop()
 
 # ตั้งค่า OpenAI Client
 client = OpenAI(
-    api_key=os.getenv("Tsk-3wY19YJQdjyYVBnwdjZKlpa3X7KG58tACnkPuAaH5rT8k70u"),  # ควรเก็บ API Key ใน environment variable
+    api_key=os.getenv("OPENAI_API_KEY"),
     base_url="https://api.opentyphoon.ai/v1",
 )
 
@@ -66,7 +66,8 @@ with st.sidebar:
     
     # เลือกโมเดล
     model_type = st.selectbox(
-        "Classify Model"
+        "Classify Model",
+        options=["Default Model", "Alternative Model"]
     )
     
     # ปรับพารามิเตอร์

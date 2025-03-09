@@ -1,9 +1,0 @@
-[tool.poetry]
-name = "AI-Based_Diabetic_Retinopathy_Detection"
-version = "0.1.0"
-description = ""
-authors = ["Jinwoo290350 <frankhupu@gmail.com>"]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.11"
