@@ -67,4 +67,4 @@ This project aims to develop a deep learning-based model for detecting diabetic 
 ### acc and loss
 
 ![image](https://github.com/user-attachments/assets/8028124a-2594-4b13-b769-7b150c9eebaa)
-![image](https://github.com/user-attachments/assets/b2b943e3-ed75-4a5b-8e2e-b93240c6b943)
+![image](https://github.com/user-attachments/assets/6028eaa9-f039-409a-8f5d-0a4677c86686)
