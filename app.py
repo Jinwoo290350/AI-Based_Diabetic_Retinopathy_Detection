@@ -67,7 +67,7 @@ st.markdown("""
 
 # โหลดโมเดล AI
 try:
-    model = load_model('CEDT_Model.h5', compile=False, safe_mode=False)
+    model = load_model('CEDT_Model (1).h5', compile=False, safe_mode=False)
     TARGET_SIZE = model.input_shape[1:3]
 except Exception as e:
     st.error(f"⚠️ ไม่สามารถโหลดโมเดลได้: {str(e)}")
